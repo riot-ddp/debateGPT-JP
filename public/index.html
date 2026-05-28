@@ -56,6 +56,18 @@
       font-size: 13px;
       font-weight: 600;
     }
+    fieldset {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin: 12px 0 0;
+      padding: 10px 11px 12px;
+    }
+    legend {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 0 4px;
+    }
     input, select, textarea {
       width: 100%;
       border: 1px solid var(--line);
@@ -84,6 +96,16 @@
       font-weight: 500;
     }
     .check input { width: auto; }
+    .choice-grid {
+      display: grid;
+      gap: 8px;
+    }
+    .choice-grid .check {
+      margin: 0;
+      align-items: flex-start;
+      font-weight: 500;
+      color: var(--ink);
+    }
     button {
       border: 0;
       border-radius: 6px;
@@ -185,12 +207,60 @@
       </label>
 
       <div id="profile" class="profile enabled">
-        <label>重視する価値</label>
-        <input id="values" value="個人の選択、公平性、社会的安定" />
-        <label>判断スタイル</label>
-        <input id="decisionStyle" value="データと制度上の公平性を重視" />
-        <label>争点の自己関連性</label>
-        <input id="selfRelevance" value="やや関係がある" />
+        <label for="primaryValue">最も重視する価値</label>
+        <select id="primaryValue">
+          <option value="個人の自由・自己決定">個人の自由・自己決定</option>
+          <option value="公平性・平等" selected>公平性・平等</option>
+          <option value="弱い立場の人の保護・害の回避">弱い立場の人の保護・害の回避</option>
+          <option value="社会の安全・安定">社会の安全・安定</option>
+          <option value="伝統・秩序・既存制度との整合性">伝統・秩序・既存制度との整合性</option>
+          <option value="身近な人・地域社会への配慮">身近な人・地域社会への配慮</option>
+          <option value="成果・効率・費用対効果">成果・効率・費用対効果</option>
+          <option value="その他">その他</option>
+        </select>
+
+        <fieldset>
+          <legend>具体的に重視する点</legend>
+          <div class="choice-grid">
+            <label class="check"><input name="specificValues" type="checkbox" value="個人が自分で選べること" checked />個人が自分で選べること</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="制度上の公平性" checked />制度上の公平性</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="不利益を受けやすい人への配慮" />不利益を受けやすい人への配慮</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="社会的混乱やリスクを避けること" checked />社会的混乱やリスクを避けること</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="既存の制度や慣習との整合性" />既存の制度や慣習との整合性</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="家族や地域社会への影響" />家族や地域社会への影響</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="将来世代への影響" />将来世代への影響</label>
+            <label class="check"><input name="specificValues" type="checkbox" value="費用対効果や実現可能性" />費用対効果や実現可能性</label>
+          </div>
+        </fieldset>
+
+        <label for="valueOther">その他の価値・補足</label>
+        <input id="valueOther" placeholder="必要な場合のみ入力" />
+
+        <fieldset>
+          <legend>判断するときに重視する根拠</legend>
+          <div class="choice-grid">
+            <label class="check"><input name="evidencePreference" type="checkbox" value="統計データや実証研究" checked />統計データや実証研究</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="当事者の経験や声" />当事者の経験や声</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="制度の公平性" checked />制度の公平性</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="社会全体への影響" />社会全体への影響</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="経済的コストや便益" />経済的コストや便益</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="専門家の意見" />専門家の意見</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="歴史的経緯や既存制度との整合性" />歴史的経緯や既存制度との整合性</label>
+            <label class="check"><input name="evidencePreference" type="checkbox" value="身近な生活への影響" />身近な生活への影響</label>
+          </div>
+        </fieldset>
+
+        <label for="evidenceOther">その他の判断根拠・補足</label>
+        <input id="evidenceOther" placeholder="必要な場合のみ入力" />
+
+        <label for="selfRelevance">争点の自己関連性</label>
+        <select id="selfRelevance">
+          <option value="1">1. まったく関係がない</option>
+          <option value="2">2. あまり関係がない</option>
+          <option value="3" selected>3. どちらともいえない</option>
+          <option value="4">4. やや関係がある</option>
+          <option value="5">5. とても関係がある</option>
+        </select>
         <label>懸念している点</label>
         <textarea id="concerns">制度変更による副作用、費用対効果、当事者への実際の影響</textarea>
       </div>
@@ -365,13 +435,22 @@
     }
 
     function profile() {
+      const selfRelevance = $("selfRelevance");
       return {
         enabled: $("personalized").checked,
-        values: $("values").value,
-        decisionStyle: $("decisionStyle").value,
-        selfRelevance: $("selfRelevance").value,
+        primaryValue: $("primaryValue").value,
+        specificValues: checkedValues("specificValues"),
+        valueOther: $("valueOther").value,
+        evidencePreference: checkedValues("evidencePreference"),
+        evidenceOther: $("evidenceOther").value,
+        selfRelevanceScore: selfRelevance.value,
+        selfRelevanceLabel: selfRelevance.options[selfRelevance.selectedIndex].text,
         concerns: $("concerns").value,
       };
+    }
+
+    function checkedValues(name) {
+      return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked')).map((input) => input.value);
     }
 
     function addMessage(title, text) {
