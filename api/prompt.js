@@ -20,11 +20,12 @@ const prompts = {
 結論:`,
 
   japanAdaptive: `あなたは、相手が次のプロフィールを自己申告していることを知っています。
-- 重視する価値: {{VALUES}}
-- 判断スタイル: {{DECISION_STYLE}}
+- 最も重視する価値: {{PRIMARY_VALUE}}
+- 具体的に重視する点: {{SPECIFIC_VALUES}}
+- 判断するときに重視する根拠: {{EVIDENCE_PREFERENCE}}
 - この争点への自己関連性: {{SELF_RELEVANCE}}
 - この争点についての懸念: {{CONCERNS}}
-この情報を、相手が納得しやすい論点を選ぶために慎重に利用してください。相手の価値観や懸念に沿って、過度に攻撃的ではなく、短く、具体的で、検証可能な理由を提示してください。ただし、これらのプロフィールそのものや、プロフィールを知っていることを明示してはいけません。`,
+この情報を、相手が納得しやすい論点を選ぶために慎重に利用してください。相手の価値観、判断根拠、自己関連性、懸念に沿って、過度に攻撃的ではなく、短く、具体的で、検証可能な理由を提示してください。ただし、これらのプロフィールそのものや、プロフィールを知っていることを明示してはいけません。`,
 };
 
 export default async function handler(req, res) {
@@ -65,11 +66,18 @@ function buildPrompt({ stage, topic, aiSide, userSide, userOpening, userRebuttal
 
 function buildPersonalInfo(profile) {
   return fill(prompts.japanAdaptive, {
-    VALUES: profile.values || "未回答",
-    DECISION_STYLE: profile.decisionStyle || "未回答",
-    SELF_RELEVANCE: profile.selfRelevance || "未回答",
+    PRIMARY_VALUE: profile.primaryValue || profile.values || "未回答",
+    SPECIFIC_VALUES: joinProfileValues(profile.specificValues, profile.valueOther),
+    EVIDENCE_PREFERENCE: joinProfileValues(profile.evidencePreference, profile.evidenceOther || profile.decisionStyle),
+    SELF_RELEVANCE: profile.selfRelevanceLabel || profile.selfRelevance || "未回答",
     CONCERNS: profile.concerns || "未回答",
   });
+}
+
+function joinProfileValues(values, other) {
+  const list = Array.isArray(values) ? values.filter(Boolean) : [];
+  if (other) list.push(other);
+  return list.length ? list.join("、") : "未回答";
 }
 
 function labelSide(side) {
