@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0"
+  },
   "scripts": {
     "dev": "vercel dev",
-    "check": "node --check api/generate.js && node --check api/prompt.js"
+    "check": "node --check api/generate.js && node --check api/prompt.js && node --check api/store.js && node --check api/session.js"
   },
   "engines": {
     "node": "22.x"
