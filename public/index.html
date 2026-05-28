@@ -32,36 +32,125 @@
       grid-template-columns: 360px 1fr;
       gap: 20px;
     }
-    h1 { grid-column: 1 / -1; margin: 0; font-size: 24px; letter-spacing: 0; }
-    h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: 0; }
-    section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
-    label { display: block; margin: 12px 0 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
-    input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 10px 11px; font: inherit; background: #fff; color: var(--ink); }
-    textarea { min-height: 112px; resize: vertical; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .check { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: var(--ink); font-size: 14px; font-weight: 500; }
+    h1 {
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 11px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+    textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 500;
+    }
     .check input { width: auto; }
-    button { border: 0; border-radius: 6px; padding: 10px 14px; background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 700; cursor: pointer; }
-    button.secondary { background: var(--soft); color: #1d3a44; }
-    button:disabled { opacity: .55; cursor: wait; }
-    .actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: var(--soft);
+      color: #1d3a44;
+    }
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
     .profile { display: none; }
     .profile.enabled { display: block; }
-    .transcript { display: grid; gap: 12px; }
-    .message { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: #fbfcfd; white-space: pre-wrap; }
-    .message strong { display: block; margin-bottom: 4px; font-size: 13px; color: var(--muted); }
-    .status { margin-top: 12px; color: var(--muted); min-height: 24px; }
-    .error { color: var(--danger); font-weight: 700; }
-    @media (max-width: 860px) { main { grid-template-columns: 1fr; } .row { grid-template-columns: 1fr; } }
+    .transcript {
+      display: grid;
+      gap: 12px;
+    }
+    .message {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfd;
+      white-space: pre-wrap;
+    }
+    .message strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .status {
+      margin-top: 12px;
+      color: var(--muted);
+      min-height: 24px;
+    }
+    .error {
+      color: var(--danger);
+      font-weight: 700;
+    }
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <main>
     <h1>DebateGPT Japan-Adaptive</h1>
+
     <section>
       <h2>設定</h2>
       <label for="accessToken">アクセスキー</label>
       <input id="accessToken" type="password" autocomplete="off" placeholder="VercelのAPP_ACCESS_TOKEN" />
+
       <label for="model">モデル</label>
       <select id="model">
         <option value="gpt-5.2" selected>gpt-5.2</option>
@@ -70,31 +159,75 @@
         <option value="gpt-5-nano">gpt-5-nano</option>
         <option value="gpt-4.1">gpt-4.1</option>
       </select>
+
       <label for="topic">討論テーマ</label>
       <input id="topic" value="日本では選択的夫婦別姓を導入すべきか" />
+
       <div class="row">
-        <div><label for="userSide">あなたの立場</label><select id="userSide"><option value="pro">賛成</option><option value="con">反対</option></select></div>
-        <div><label for="pre">討論前の同意度</label><select id="pre"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div>
+        <div>
+          <label for="userSide">あなたの立場</label>
+          <select id="userSide">
+            <option value="pro">賛成</option>
+            <option value="con">反対</option>
+          </select>
+        </div>
+        <div>
+          <label for="pre">討論前の同意度</label>
+          <select id="pre">
+            <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+          </select>
+        </div>
       </div>
-      <label class="check"><input id="personalized" type="checkbox" checked />日本適応型パーソナライズを使う</label>
+
+      <label class="check">
+        <input id="personalized" type="checkbox" checked />
+        日本適応型パーソナライズを使う
+      </label>
+
       <div id="profile" class="profile enabled">
-        <label>重視する価値</label><input id="values" value="個人の選択、公平性、社会的安定" />
-        <label>判断スタイル</label><input id="decisionStyle" value="データと制度上の公平性を重視" />
-        <label>争点の自己関連性</label><input id="selfRelevance" value="やや関係がある" />
-        <label>懸念している点</label><textarea id="concerns">制度変更による副作用、費用対効果、当事者への実際の影響</textarea>
+        <label>重視する価値</label>
+        <input id="values" value="個人の選択、公平性、社会的安定" />
+        <label>判断スタイル</label>
+        <input id="decisionStyle" value="データと制度上の公平性を重視" />
+        <label>争点の自己関連性</label>
+        <input id="selfRelevance" value="やや関係がある" />
+        <label>懸念している点</label>
+        <textarea id="concerns">制度変更による副作用、費用対効果、当事者への実際の影響</textarea>
       </div>
-      <div class="actions"><button id="start">AIの冒頭意見を生成</button><button id="reset" class="secondary">リセット</button></div>
+
+      <div class="actions">
+        <button id="start">AIの冒頭意見を生成</button>
+        <button id="save" class="secondary" disabled>サーバー保存</button>
+        <button id="history" class="secondary">履歴読込</button>
+        <button id="reset" class="secondary">リセット</button>
+      </div>
       <div id="status" class="status"></div>
+      <div id="historyList" class="transcript"></div>
     </section>
+
     <section>
       <h2>討論</h2>
       <div id="transcript" class="transcript"></div>
+
       <label id="inputLabel" for="userText">あなたの入力</label>
       <textarea id="userText" placeholder="ここに文章を入力します"></textarea>
-      <div class="actions"><button id="next" disabled>次へ</button><button id="download" class="secondary" disabled>ログ保存</button></div>
-      <div class="row"><div><label for="post">討論後の同意度</label><select id="post"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option></select></div></div>
+
+      <div class="actions">
+        <button id="next" disabled>次へ</button>
+        <button id="download" class="secondary" disabled>ログ保存</button>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="post">討論後の同意度</label>
+          <select id="post">
+            <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+          </select>
+        </div>
+      </div>
     </section>
   </main>
+
   <script>
     const state = {
       step: "idle",
@@ -103,19 +236,29 @@
       userRebuttal: "",
       log: [],
     };
+
     const $ = (id) => document.getElementById(id);
     const transcript = $("transcript");
     const status = $("status");
+
     $("accessToken").value = localStorage.getItem("debategptAccessToken") || "";
-    $("accessToken").addEventListener("change", () => localStorage.setItem("debategptAccessToken", $("accessToken").value.trim()));
-    $("personalized").addEventListener("change", () => $("profile").classList.toggle("enabled", $("personalized").checked));
+    $("accessToken").addEventListener("change", () => {
+      localStorage.setItem("debategptAccessToken", $("accessToken").value.trim());
+    });
+    $("personalized").addEventListener("change", () => {
+      $("profile").classList.toggle("enabled", $("personalized").checked);
+    });
     $("start").addEventListener("click", startDebate);
     $("next").addEventListener("click", nextStep);
     $("reset").addEventListener("click", () => location.reload());
     $("download").addEventListener("click", downloadLog);
+    $("save").addEventListener("click", saveSession);
+    $("history").addEventListener("click", loadHistory);
+
     function userSide() { return $("userSide").value; }
     function aiSide() { return userSide() === "pro" ? "con" : "pro"; }
     function sideLabel(side) { return side === "pro" ? "賛成" : "反対"; }
+
     async function startDebate() {
       transcript.innerHTML = "";
       state.messages = [{ role: "system", content: "あなたは日本語で短く討論するAIです。指定された立場を守り、虚偽の断定を避け、1〜2文で簡潔に答えてください。" }];
@@ -123,7 +266,15 @@
       state.userRebuttal = "";
       state.log = [];
       $("post").value = $("pre").value;
-      addMessage("設定", "モデル: " + $("model").value + "\nテーマ: " + $("topic").value + "\nあなた: " + sideLabel(userSide()) + " / AI: " + sideLabel(aiSide()) + "\n日本適応型パーソナライズ: " + ($("personalized").checked ? "あり" : "なし") + "\n討論前同意度: " + $("pre").value);
+
+      addMessage(
+        "設定",
+        "モデル: " + $("model").value +
+          "\nテーマ: " + $("topic").value +
+          "\nあなた: " + sideLabel(userSide()) + " / AI: " + sideLabel(aiSide()) +
+          "\n日本適応型パーソナライズ: " + ($("personalized").checked ? "あり" : "なし") +
+          "\n討論前同意度: " + $("pre").value,
+      );
       const aiOpening = await generate("opening");
       addMessage("AI 冒頭意見", aiOpening);
       state.step = "userOpening";
@@ -131,10 +282,13 @@
       $("userText").value = "";
       $("next").disabled = false;
       $("download").disabled = false;
+      $("save").disabled = false;
     }
+
     async function nextStep() {
       const text = $("userText").value.trim();
       if (!text) return setStatus("入力欄に文章を書いてください。", true);
+
       if (state.step === "userOpening") {
         state.userOpening = text;
         addMessage("あなたの冒頭意見", text);
@@ -145,6 +299,7 @@
         $("inputLabel").textContent = "あなたの反論";
         return;
       }
+
       if (state.step === "userRebuttal") {
         state.userRebuttal = text;
         addMessage("あなたの反論", text);
@@ -155,6 +310,7 @@
         $("inputLabel").textContent = "あなたの結論";
         return;
       }
+
       if (state.step === "userConclusion") {
         addMessage("あなたの結論", text);
         addMessage("結果", "討論前同意度: " + $("pre").value + "\n討論後同意度: " + $("post").value);
@@ -163,6 +319,7 @@
         setStatus("完了しました。");
       }
     }
+
     async function generate(stage) {
       setBusy(true);
       setStatus("生成中...");
@@ -170,13 +327,28 @@
         const promptResponse = await fetch("/api/prompt", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ stage, topic: $("topic").value, aiSide: aiSide(), userSide: userSide(), userOpening: state.userOpening, userRebuttal: state.userRebuttal, profile: profile() }),
+          body: JSON.stringify({
+            stage,
+            topic: $("topic").value,
+            aiSide: aiSide(),
+            userSide: userSide(),
+            userOpening: state.userOpening,
+            userRebuttal: state.userRebuttal,
+            profile: profile(),
+          }),
         });
         const { prompt } = await promptResponse.json();
         const response = await fetch("/api/generate", {
           method: "POST",
-          headers: { "content-type": "application/json", "x-app-access-token": $("accessToken").value.trim() },
-          body: JSON.stringify({ model: $("model").value, messages: state.messages, prompt }),
+          headers: {
+            "content-type": "application/json",
+            "x-app-access-token": $("accessToken").value.trim(),
+          },
+          body: JSON.stringify({
+            model: $("model").value,
+            messages: state.messages,
+            prompt,
+          }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "生成に失敗しました。");
@@ -191,19 +363,32 @@
         setBusy(false);
       }
     }
+
     function profile() {
-      return { enabled: $("personalized").checked, values: $("values").value, decisionStyle: $("decisionStyle").value, selfRelevance: $("selfRelevance").value, concerns: $("concerns").value };
+      return {
+        enabled: $("personalized").checked,
+        values: $("values").value,
+        decisionStyle: $("decisionStyle").value,
+        selfRelevance: $("selfRelevance").value,
+        concerns: $("concerns").value,
+      };
     }
+
     function addMessage(title, text) {
+      renderMessage(title, text);
+      state.log.push({ title, text, at: new Date().toISOString() });
+    }
+
+    function renderMessage(title, text) {
       const div = document.createElement("div");
       div.className = "message";
       div.innerHTML = "<strong></strong><span></span>";
       div.querySelector("strong").textContent = title;
       div.querySelector("span").textContent = text;
       transcript.appendChild(div);
-      state.log.push({ title, text, at: new Date().toISOString() });
       div.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
+
     function downloadLog() {
       const blob = new Blob([JSON.stringify(state.log, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -213,8 +398,92 @@
       a.click();
       URL.revokeObjectURL(url);
     }
-    function setBusy(busy) { $("start").disabled = busy; $("next").disabled = busy || state.step === "idle"; }
-    function setStatus(text, isError = false) { status.textContent = text; status.className = "status" + (isError ? " error" : ""); }
+
+    async function saveSession() {
+      setStatus("保存中...");
+      try {
+        const response = await fetch("/api/store", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-app-access-token": $("accessToken").value.trim(),
+          },
+          body: JSON.stringify({
+            topic: $("topic").value,
+            model: $("model").value,
+            userSide: userSide(),
+            aiSide: aiSide(),
+            personalized: $("personalized").checked,
+            profile: profile(),
+            preAgreement: $("pre").value,
+            postAgreement: $("post").value,
+            log: state.log,
+          }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "保存に失敗しました。");
+        setStatus("保存しました: session #" + data.session.id);
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    async function loadHistory() {
+      const list = $("historyList");
+      list.innerHTML = "";
+      setStatus("履歴読込中...");
+      try {
+        const response = await fetch("/api/store", {
+          method: "GET",
+          headers: { "x-app-access-token": $("accessToken").value.trim() },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "履歴の読込に失敗しました。");
+        if (!data.sessions.length) list.textContent = "保存済み履歴はありません。";
+        for (const session of data.sessions) {
+          const item = document.createElement("button");
+          item.className = "secondary";
+          item.textContent = "#" + session.id + " " + new Date(session.created_at).toLocaleString() + " / " + session.topic;
+          item.addEventListener("click", () => loadSession(session.id));
+          list.appendChild(item);
+        }
+        setStatus("履歴を読み込みました。");
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    async function loadSession(id) {
+      setStatus("セッション読込中...");
+      try {
+        const response = await fetch("/api/session?id=" + encodeURIComponent(id), {
+          headers: { "x-app-access-token": $("accessToken").value.trim() },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "セッションの読込に失敗しました。");
+        transcript.innerHTML = "";
+        state.log = data.session.log || [];
+        for (const entry of state.log) renderMessage(entry.title, entry.text);
+        $("topic").value = data.session.topic || $("topic").value;
+        $("model").value = data.session.model || $("model").value;
+        $("userSide").value = data.session.user_side || $("userSide").value;
+        $("pre").value = data.session.pre_agreement || $("pre").value;
+        $("post").value = data.session.post_agreement || $("post").value;
+        setStatus("セッション #" + id + " を表示しました。");
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    function setBusy(busy) {
+      $("start").disabled = busy;
+      $("next").disabled = busy || state.step === "idle";
+    }
+
+    function setStatus(text, isError = false) {
+      status.textContent = text;
+      status.className = "status" + (isError ? " error" : "");
+    }
   </script>
 </body>
 </html>
