@@ -182,6 +182,13 @@
         <option value="gpt-4.1">gpt-4.1</option>
       </select>
 
+      <label for="experimentMode">実験モード</label>
+      <select id="experimentMode">
+        <option value="none">非パーソナライズ</option>
+        <option value="japan_adaptive" selected>日本適応型パーソナライズ</option>
+        <option value="party_affiliation">政党属性パーソナライズ</option>
+      </select>
+
       <label for="topic">討論テーマ</label>
       <input id="topic" value="日本では選択的夫婦別姓を導入すべきか" />
 
@@ -201,12 +208,7 @@
         </div>
       </div>
 
-      <label class="check">
-        <input id="personalized" type="checkbox" checked />
-        日本適応型パーソナライズを使う
-      </label>
-
-      <div id="profile" class="profile enabled">
+      <div id="japanProfile" class="profile enabled">
         <label for="primaryValue">最も重視する価値</label>
         <select id="primaryValue">
           <option value="個人の自由・自己決定">個人の自由・自己決定</option>
@@ -265,6 +267,69 @@
         <textarea id="concerns">制度変更による副作用、費用対効果、当事者への実際の影響</textarea>
       </div>
 
+      <div id="partyProfile" class="profile">
+        <label for="partySupport">支持政党</label>
+        <select id="partySupport">
+          <option value="自由民主党">自由民主党</option>
+          <option value="立憲民主党">立憲民主党</option>
+          <option value="日本維新の会">日本維新の会</option>
+          <option value="公明党">公明党</option>
+          <option value="国民民主党">国民民主党</option>
+          <option value="日本共産党">日本共産党</option>
+          <option value="れいわ新選組">れいわ新選組</option>
+          <option value="参政党">参政党</option>
+          <option value="その他の政党">その他の政党</option>
+          <option value="特に支持している政党はない" selected>特に支持している政党はない</option>
+          <option value="回答したくない">回答したくない</option>
+        </select>
+
+        <label for="partySupportStrength">支持の強さ</label>
+        <select id="partySupportStrength">
+          <option value="1">1. とても弱い</option>
+          <option value="2">2. やや弱い</option>
+          <option value="3" selected>3. どちらともいえない</option>
+          <option value="4">4. やや強い</option>
+          <option value="5">5. とても強い</option>
+        </select>
+
+        <label for="politicalInterest">政治関心</label>
+        <select id="politicalInterest">
+          <option value="1">1. まったく関心がない</option>
+          <option value="2">2. あまり関心がない</option>
+          <option value="3" selected>3. どちらともいえない</option>
+          <option value="4">4. やや関心がある</option>
+          <option value="5">5. とても関心がある</option>
+        </select>
+
+        <label for="ideology">政治的自己配置</label>
+        <select id="ideology">
+          <option value="とてもリベラル">とてもリベラル</option>
+          <option value="ややリベラル">ややリベラル</option>
+          <option value="中間" selected>中間</option>
+          <option value="やや保守">やや保守</option>
+          <option value="とても保守">とても保守</option>
+          <option value="わからない">わからない</option>
+        </select>
+
+        <label for="topicAttitude">このテーマへの事前態度</label>
+        <select id="topicAttitude">
+          <option value="1">1. 強く反対</option>
+          <option value="2">2. やや反対</option>
+          <option value="3" selected>3. どちらともいえない</option>
+          <option value="4">4. やや賛成</option>
+          <option value="5">5. 強く賛成</option>
+        </select>
+
+        <label for="attitudeStrength">このテーマへの意見の強さ</label>
+        <select id="attitudeStrength">
+          <option value="1">1. ほとんど意見を持っていない</option>
+          <option value="2">2. あまり強い意見ではない</option>
+          <option value="3" selected>3. どちらともいえない</option>
+          <option value="4">4. やや強い意見を持っている</option>
+          <option value="5">5. とても強い意見を持っている</option>
+        </select>
+      </div>
+
       <div class="actions">
         <button id="start">AIの冒頭意見を生成</button>
         <button id="save" class="secondary" disabled>サーバー保存</button>
@@ -315,9 +380,8 @@
     $("accessToken").addEventListener("change", () => {
       localStorage.setItem("debategptAccessToken", $("accessToken").value.trim());
     });
-    $("personalized").addEventListener("change", () => {
-      $("profile").classList.toggle("enabled", $("personalized").checked);
-    });
+    initModeFromUrl();
+    $("experimentMode").addEventListener("change", updateModeVisibility);
     $("start").addEventListener("click", startDebate);
     $("next").addEventListener("click", nextStep);
     $("reset").addEventListener("click", () => location.reload());
@@ -342,7 +406,7 @@
         "モデル: " + $("model").value +
           "\nテーマ: " + $("topic").value +
           "\nあなた: " + sideLabel(userSide()) + " / AI: " + sideLabel(aiSide()) +
-          "\n日本適応型パーソナライズ: " + ($("personalized").checked ? "あり" : "なし") +
+          "\n実験モード: " + modeLabel($("experimentMode").value) +
           "\n討論前同意度: " + $("pre").value,
       );
       const aiOpening = await generate("opening");
@@ -435,9 +499,15 @@
     }
 
     function profile() {
+      const mode = $("experimentMode").value;
       const selfRelevance = $("selfRelevance");
+      const topicAttitude = $("topicAttitude");
+      const attitudeStrength = $("attitudeStrength");
+      const partySupportStrength = $("partySupportStrength");
+      const politicalInterest = $("politicalInterest");
       return {
-        enabled: $("personalized").checked,
+        enabled: mode !== "none",
+        experimentMode: mode,
         primaryValue: $("primaryValue").value,
         specificValues: checkedValues("specificValues"),
         valueOther: $("valueOther").value,
@@ -446,7 +516,39 @@
         selfRelevanceScore: selfRelevance.value,
         selfRelevanceLabel: selfRelevance.options[selfRelevance.selectedIndex].text,
         concerns: $("concerns").value,
+        partySupport: $("partySupport").value,
+        partySupportStrengthScore: partySupportStrength.value,
+        partySupportStrengthLabel: partySupportStrength.options[partySupportStrength.selectedIndex].text,
+        politicalInterestScore: politicalInterest.value,
+        politicalInterestLabel: politicalInterest.options[politicalInterest.selectedIndex].text,
+        ideology: $("ideology").value,
+        topicAttitudeScore: topicAttitude.value,
+        topicAttitudeLabel: topicAttitude.options[topicAttitude.selectedIndex].text,
+        attitudeStrengthScore: attitudeStrength.value,
+        attitudeStrengthLabel: attitudeStrength.options[attitudeStrength.selectedIndex].text,
       };
+    }
+
+    function initModeFromUrl() {
+      const mode = new URLSearchParams(location.search).get("mode");
+      if (["none", "japan_adaptive", "party_affiliation"].includes(mode)) {
+        $("experimentMode").value = mode;
+      }
+      updateModeVisibility();
+    }
+
+    function updateModeVisibility() {
+      const mode = $("experimentMode").value;
+      $("japanProfile").classList.toggle("enabled", mode === "japan_adaptive");
+      $("partyProfile").classList.toggle("enabled", mode === "party_affiliation");
+    }
+
+    function modeLabel(mode) {
+      return {
+        none: "非パーソナライズ",
+        japan_adaptive: "日本適応型パーソナライズ",
+        party_affiliation: "政党属性パーソナライズ",
+      }[mode] || mode;
     }
 
     function checkedValues(name) {
@@ -481,6 +583,7 @@
     async function saveSession() {
       setStatus("保存中...");
       try {
+        const currentProfile = profile();
         const response = await fetch("/api/store", {
           method: "POST",
           headers: {
@@ -492,8 +595,8 @@
             model: $("model").value,
             userSide: userSide(),
             aiSide: aiSide(),
-            personalized: $("personalized").checked,
-            profile: profile(),
+            personalized: currentProfile.enabled,
+            profile: currentProfile,
             preAgreement: $("pre").value,
             postAgreement: $("post").value,
             log: state.log,
@@ -548,9 +651,36 @@
         $("userSide").value = data.session.user_side || $("userSide").value;
         $("pre").value = data.session.pre_agreement || $("pre").value;
         $("post").value = data.session.post_agreement || $("post").value;
+        applyLoadedProfile(data.session.profile);
         setStatus("セッション #" + id + " を表示しました。");
       } catch (error) {
         setStatus(error.message, true);
+      }
+    }
+
+    function applyLoadedProfile(loadedProfile) {
+      if (!loadedProfile) return;
+      if (loadedProfile.experimentMode) $("experimentMode").value = loadedProfile.experimentMode;
+      if (loadedProfile.primaryValue) $("primaryValue").value = loadedProfile.primaryValue;
+      if (loadedProfile.valueOther) $("valueOther").value = loadedProfile.valueOther;
+      if (loadedProfile.evidenceOther) $("evidenceOther").value = loadedProfile.evidenceOther;
+      if (loadedProfile.selfRelevanceScore) $("selfRelevance").value = loadedProfile.selfRelevanceScore;
+      if (loadedProfile.concerns) $("concerns").value = loadedProfile.concerns;
+      if (loadedProfile.partySupport) $("partySupport").value = loadedProfile.partySupport;
+      if (loadedProfile.partySupportStrengthScore) $("partySupportStrength").value = loadedProfile.partySupportStrengthScore;
+      if (loadedProfile.politicalInterestScore) $("politicalInterest").value = loadedProfile.politicalInterestScore;
+      if (loadedProfile.ideology) $("ideology").value = loadedProfile.ideology;
+      if (loadedProfile.topicAttitudeScore) $("topicAttitude").value = loadedProfile.topicAttitudeScore;
+      if (loadedProfile.attitudeStrengthScore) $("attitudeStrength").value = loadedProfile.attitudeStrengthScore;
+      setCheckedValues("specificValues", loadedProfile.specificValues || []);
+      setCheckedValues("evidencePreference", loadedProfile.evidencePreference || []);
+      updateModeVisibility();
+    }
+
+    function setCheckedValues(name, values) {
+      const selected = new Set(values);
+      for (const input of document.querySelectorAll('input[name="' + name + '"]')) {
+        input.checked = selected.has(input.value);
       }
     }
 
