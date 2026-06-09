@@ -20,12 +20,14 @@ const prompts = {
 結論:`,
 
   japanAdaptive: `あなたは、相手が次のプロフィールを自己申告していることを知っています。
+- 価値カテゴリの設計根拠: Schwartz価値理論、BPVI、MFQ-Jを参考にした短縮選択式
 - 最も重視する価値: {{PRIMARY_VALUE}}
-- 具体的に重視する点: {{SPECIFIC_VALUES}}
+- あわせて重視する価値: {{SPECIFIC_VALUES}}
+- 価値カテゴリに基づく説得方略: {{VALUE_GUIDELINES}}
 - 判断するときに重視する根拠: {{EVIDENCE_PREFERENCE}}
 - この争点への自己関連性: {{SELF_RELEVANCE}}
 - この争点についての懸念: {{CONCERNS}}
-この情報を、相手が納得しやすい論点を選ぶために慎重に利用してください。相手の価値観、判断根拠、自己関連性、懸念に沿って、過度に攻撃的ではなく、短く、具体的で、検証可能な理由を提示してください。ただし、これらのプロフィールそのものや、プロフィールを知っていることを明示してはいけません。`,
+この情報を、相手が納得しやすい論点を選ぶために慎重に利用してください。価値カテゴリは相手を決めつけるためではなく、見落としてはいけない観点を選ぶための手がかりです。相手の価値観、判断根拠、自己関連性、懸念に沿って、過度に攻撃的ではなく、短く、具体的で、検証可能な理由を提示してください。ただし、これらのプロフィールそのものや、プロフィールを知っていることを明示してはいけません。`,
 
   partyAffiliation: `あなたは、相手が「{{OPPONENT_SIDE}}」側として討論に参加しており、次の特徴を自己申告していることを知っています。
 - 支持政党: {{PARTY_SUPPORT}}
@@ -89,10 +91,46 @@ function buildPersonalInfo(profile, userSide) {
   return fill(prompts.japanAdaptive, {
     PRIMARY_VALUE: profile.primaryValue || profile.values || "未回答",
     SPECIFIC_VALUES: joinProfileValues(profile.specificValues, profile.valueOther),
+    VALUE_GUIDELINES: buildValueGuidelines(profile),
     EVIDENCE_PREFERENCE: joinProfileValues(profile.evidencePreference, profile.evidenceOther || profile.decisionStyle),
     SELF_RELEVANCE: profile.selfRelevanceLabel || profile.selfRelevance || "未回答",
     CONCERNS: profile.concerns || "未回答",
   });
+}
+
+function buildValueGuidelines(profile) {
+  const values = new Set([
+    profile.primaryValue,
+    ...(Array.isArray(profile.specificValues) ? profile.specificValues : []),
+  ].filter(Boolean));
+
+  const guidelines = [];
+  if (values.has("個人の自由・自己決定")) {
+    guidelines.push("選択肢が増えること、強制ではないこと、本人の自己決定を尊重することを重視する");
+  }
+  if (values.has("公平性・弱い立場の人への配慮") || values.has("公平性・平等") || values.has("弱い立場の人の保護・害の回避")) {
+    guidelines.push("制度上の不利益、負担の偏り、弱い立場の人への影響を具体的に扱う");
+  }
+  if (values.has("安全・生活の安定") || values.has("社会の安全・安定")) {
+    guidelines.push("リスク、生活への影響、制度変更時の安定性を軽視せずに説明する");
+  }
+  if (values.has("家族・伝統・社会秩序") || values.has("伝統・秩序・既存制度との整合性")) {
+    guidelines.push("既存制度や家族観を否定せず、段階的な制度設計や両立可能性を示す");
+  }
+  if (values.has("経済的合理性・効率") || values.has("成果・効率・費用対効果")) {
+    guidelines.push("費用対効果、手続きコスト、社会的効率、実現可能性に触れる");
+  }
+  if (values.has("将来世代・社会全体への影響")) {
+    guidelines.push("短期的な利害だけでなく、将来世代や社会全体への影響を含める");
+  }
+  if (values.has("調和・混乱回避")) {
+    guidelines.push("断定や論破調を避け、相手の懸念を認めつつ、社会的混乱を抑える説明にする");
+  }
+  if (values.has("専門家・制度への信頼")) {
+    guidelines.push("専門家の知見、制度設計、透明性、検証可能性を重視する");
+  }
+
+  return guidelines.length ? guidelines.join("。") : "選択された価値に沿って、相手の懸念を否定せずに論点を選ぶ";
 }
 
 function joinProfileValues(values, other) {
