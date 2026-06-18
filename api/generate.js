@@ -5,14 +5,6 @@ export default async function handler(req, res) {
     return sendJson(res, 405, { error: "Method not allowed" });
   }
 
-  const expectedToken = process.env.APP_ACCESS_TOKEN;
-  if (expectedToken) {
-    const suppliedToken = req.headers["x-app-access-token"];
-    if (suppliedToken !== expectedToken) {
-      return sendJson(res, 401, { error: "アクセスキーが正しくありません。" });
-    }
-  }
-
   if (!process.env.OPENAI_API_KEY) {
     return sendJson(res, 500, { error: "Vercel環境変数 OPENAI_API_KEY が未設定です。" });
   }

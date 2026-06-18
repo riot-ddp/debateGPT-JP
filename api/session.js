@@ -1,11 +1,6 @@
 import { sql } from "@vercel/postgres";
 
 export default async function handler(req, res) {
-  const expectedToken = process.env.APP_ACCESS_TOKEN;
-  if (expectedToken && req.headers["x-app-access-token"] !== expectedToken) {
-    return sendJson(res, 401, { error: "アクセスキーが正しくありません。" });
-  }
-
   if (!process.env.POSTGRES_URL) {
     return sendJson(res, 501, {
       error: "POSTGRES_URL が未設定です。Vercel StorageでPostgresを接続してください。",

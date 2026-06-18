@@ -37,6 +37,14 @@ const prompts = {
 - この争点への事前態度: {{TOPIC_ATTITUDE}}
 - この争点への意見の強さ: {{ATTITUDE_STRENGTH}}
 あなたはこの情報を慎重かつ戦略的に用いて、相手があなたの立場に納得しやすくなるような論点を選び、説得力のある主張を作成してください。ただし、相手の支持政党や政治的特徴を直接名指ししたり、それらの情報を知っていることを明示してはいけません。虚偽の事実、個人攻撃、差別的または脅迫的な表現は避けてください。`,
+
+  reiPersonalized: `あなたは、相手がREI（Rational-Experiential Inventory）を参考にした短縮プロファイリング項目へ回答していることを知っています。
+- 設計根拠: Pacini & Epstein (1999) のrational / experiential processingの2次元を参考にした短縮項目
+- Rational得点: {{RATIONAL_SCORE}} / 7
+- Experiential得点: {{EXPERIENTIAL_SCORE}} / 7
+- 推定スタイル: {{REI_STYLE}}
+- 説得方略: {{REI_GUIDELINES}}
+この情報は、相手が理解しやすい説明形式を選ぶために使ってください。rational傾向が高い場合は、根拠、因果関係、制度設計、論理的一貫性を重視してください。experiential傾向が高い場合は、身近な具体例、生活場面、当事者の感覚、実感として納得しやすい説明を重視してください。相手の内面を決めつけたり、REI、尺度、得点、プロフィールを知っていることを明示してはいけません。虚偽の事実、過度な感情操作、個人攻撃は避けてください。`,
 };
 
 export default async function handler(req, res) {
@@ -88,6 +96,16 @@ function buildPersonalInfo(profile, userSide) {
     });
   }
 
+  if (profile.experimentMode === "rei_personalized") {
+    const rei = summarizeReiProfile(profile);
+    return fill(prompts.reiPersonalized, {
+      RATIONAL_SCORE: rei.rationalScore,
+      EXPERIENTIAL_SCORE: rei.experientialScore,
+      REI_STYLE: rei.style,
+      REI_GUIDELINES: rei.guidelines,
+    });
+  }
+
   return fill(prompts.japanAdaptive, {
     PRIMARY_VALUE: profile.primaryValue || profile.values || "未回答",
     SPECIFIC_VALUES: joinProfileValues(profile.specificValues, profile.valueOther),
@@ -96,6 +114,56 @@ function buildPersonalInfo(profile, userSide) {
     SELF_RELEVANCE: profile.selfRelevanceLabel || profile.selfRelevance || "未回答",
     CONCERNS: profile.concerns || "未回答",
   });
+}
+
+function summarizeReiProfile(profile) {
+  const rationalScore = average([
+    profile.reiRationalEvidence,
+    profile.reiRationalComplexity,
+    profile.reiRationalConsistency,
+    profile.reiRationalStructure,
+  ]);
+  const experientialScore = average([
+    profile.reiExperientialIntuition,
+    profile.reiExperientialConcrete,
+    profile.reiExperientialFeeling,
+    profile.reiExperientialStories,
+  ]);
+
+  const diff = rationalScore - experientialScore;
+  let style = "Balanced";
+  let guidelines = "具体例と論理の両方を用い、身近な場面から入りつつ、根拠や制度上の説明で支える";
+
+  if (rationalScore < 3.5 && experientialScore < 3.5) {
+    style = "Low-elaboration";
+    guidelines = "複雑な論証を重ねず、結論、理由、身近な例を短く明確に示す";
+  } else if (diff >= 0.75) {
+    style = "Rational-dominant";
+    guidelines = "統計や実証研究、因果関係、制度上の整合性、反論への論理的応答を中心にする";
+  } else if (diff <= -0.75) {
+    style = "Experiential-dominant";
+    guidelines = "抽象的な制度説明だけでなく、身近な具体例、生活場面、当事者視点、実感として理解しやすい表現を中心にする";
+  } else if (rationalScore >= 4.5 && experientialScore >= 4.5) {
+    style = "Dual high";
+    guidelines = "最初に具体例や相手の懸念を置き、その後で根拠、因果関係、制度設計を簡潔に示す";
+  }
+
+  return {
+    rationalScore: formatScore(rationalScore),
+    experientialScore: formatScore(experientialScore),
+    style,
+    guidelines,
+  };
+}
+
+function average(values) {
+  const numeric = values.map(Number).filter((value) => Number.isFinite(value));
+  if (!numeric.length) return 0;
+  return numeric.reduce((sum, value) => sum + value, 0) / numeric.length;
+}
+
+function formatScore(value) {
+  return Number.isFinite(value) ? value.toFixed(2) : "未回答";
 }
 
 function buildValueGuidelines(profile) {

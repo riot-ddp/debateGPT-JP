@@ -154,6 +154,37 @@
       color: var(--muted);
       min-height: 24px;
     }
+    .dev-tools {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+    .compare-panel {
+      display: none;
+      margin-top: 12px;
+    }
+    .compare-panel.enabled {
+      display: grid;
+      gap: 12px;
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .compare-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfd;
+      white-space: pre-wrap;
+    }
+    .compare-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
     .error {
       color: var(--danger);
       font-weight: 700;
@@ -161,6 +192,7 @@
     @media (max-width: 860px) {
       main { grid-template-columns: 1fr; }
       .row { grid-template-columns: 1fr; }
+      .compare-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -170,9 +202,6 @@
 
     <section>
       <h2>設定</h2>
-      <label for="accessToken">アクセスキー</label>
-      <input id="accessToken" type="password" autocomplete="off" placeholder="VercelのAPP_ACCESS_TOKEN" />
-
       <label for="model">モデル</label>
       <select id="model">
         <option value="gpt-5.2" selected>gpt-5.2</option>
@@ -186,6 +215,7 @@
       <select id="experimentMode">
         <option value="none">非パーソナライズ</option>
         <option value="japan_adaptive" selected>日本適応型パーソナライズ</option>
+        <option value="rei_personalized">REI型パーソナライズ</option>
         <option value="party_affiliation">政党属性パーソナライズ</option>
       </select>
 
@@ -268,6 +298,102 @@
         <textarea id="concerns">制度変更による副作用、費用対効果、当事者への実際の影響</textarea>
       </div>
 
+      <div id="reiProfile" class="profile">
+        <fieldset>
+          <legend>Rational processing（論理・根拠を重視）</legend>
+          <label for="reiRationalEvidence">社会的争点を判断するとき、理由や根拠を詳しく確認したい。</label>
+          <select id="reiRationalEvidence">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+
+          <label for="reiRationalComplexity">複雑な問題でも、筋道立てて考えることを好む。</label>
+          <select id="reiRationalComplexity">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+
+          <label for="reiRationalConsistency">主張を受け入れる前に、論理の一貫性を確認したい。</label>
+          <select id="reiRationalConsistency">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+
+          <label for="reiRationalStructure">意見を決めるとき、感覚よりも、論点を整理して考える方だ。</label>
+          <select id="reiRationalStructure">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <legend>Experiential processing（直感・経験を重視）</legend>
+          <label for="reiExperientialIntuition">判断するとき、自分の直感や感覚を信頼することが多い。</label>
+          <select id="reiExperientialIntuition">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+
+          <label for="reiExperientialConcrete">具体的な経験や身近な例があると、納得しやすい。</label>
+          <select id="reiExperientialConcrete">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+
+          <label for="reiExperientialFeeling">理由を細かく説明されるより、「実感としてわかる」説明の方が理解しやすい。</label>
+          <select id="reiExperientialFeeling">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+
+          <label for="reiExperientialStories">人の経験談や具体的な場面を聞くと、問題を理解しやすい。</label>
+          <select id="reiExperientialStories">
+            <option value="1">1. まったくあてはまらない</option>
+            <option value="2">2. あまりあてはまらない</option>
+            <option value="3">3. ややあてはまらない</option>
+            <option value="4" selected>4. どちらともいえない</option>
+            <option value="5">5. ややあてはまる</option>
+            <option value="6">6. かなりあてはまる</option>
+            <option value="7">7. とてもあてはまる</option>
+          </select>
+        </fieldset>
+      </div>
+
       <div id="partyProfile" class="profile">
         <label for="partySupport">支持政党</label>
         <select id="partySupport">
@@ -337,6 +463,12 @@
         <button id="history" class="secondary">履歴読込</button>
         <button id="reset" class="secondary">リセット</button>
       </div>
+      <div class="dev-tools">
+        <label class="check">
+          <input id="devCompare" type="checkbox" />
+          開発者モード: パーソナライズ版と非パーソナライズ版を同時比較
+        </label>
+      </div>
       <div id="status" class="status"></div>
       <div id="historyList" class="transcript"></div>
     </section>
@@ -344,6 +476,7 @@
     <section>
       <h2>討論</h2>
       <div id="transcript" class="transcript"></div>
+      <div id="comparisonPanel" class="compare-panel"></div>
 
       <label id="inputLabel" for="userText">あなたの入力</label>
       <textarea id="userText" placeholder="ここに文章を入力します"></textarea>
@@ -377,12 +510,11 @@
     const transcript = $("transcript");
     const status = $("status");
 
-    $("accessToken").value = localStorage.getItem("debategptAccessToken") || "";
-    $("accessToken").addEventListener("change", () => {
-      localStorage.setItem("debategptAccessToken", $("accessToken").value.trim());
-    });
     initModeFromUrl();
     $("experimentMode").addEventListener("change", updateModeVisibility);
+    $("devCompare").addEventListener("change", () => {
+      $("comparisonPanel").classList.toggle("enabled", $("devCompare").checked && $("comparisonPanel").children.length > 0);
+    });
     $("start").addEventListener("click", startDebate);
     $("next").addEventListener("click", nextStep);
     $("reset").addEventListener("click", () => location.reload());
@@ -396,6 +528,8 @@
 
     async function startDebate() {
       transcript.innerHTML = "";
+      $("comparisonPanel").innerHTML = "";
+      $("comparisonPanel").classList.toggle("enabled", $("devCompare").checked);
       state.messages = [{ role: "system", content: "あなたは日本語で短く討論するAIです。指定された立場を守り、虚偽の断定を避け、1〜2文で簡潔に答えてください。" }];
       state.userOpening = "";
       state.userRebuttal = "";
@@ -459,35 +593,24 @@
       setBusy(true);
       setStatus("生成中...");
       try {
-        const promptResponse = await fetch("/api/prompt", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            stage,
-            topic: $("topic").value,
-            aiSide: aiSide(),
-            userSide: userSide(),
-            userOpening: state.userOpening,
-            userRebuttal: state.userRebuttal,
-            profile: profile(),
-          }),
-        });
-        const { prompt } = await promptResponse.json();
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-app-access-token": $("accessToken").value.trim(),
-          },
-          body: JSON.stringify({
-            model: $("model").value,
-            messages: state.messages,
-            prompt,
-          }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "生成に失敗しました。");
-        state.messages.push({ role: "user", content: prompt });
+        const activeProfile = profile();
+        const activePrompt = await fetchPrompt(stage, activeProfile);
+        const messagesSnapshot = state.messages.map((message) => ({ ...message }));
+        let data;
+
+        if ($("devCompare").checked && activeProfile.enabled) {
+          const neutralPrompt = await fetchPrompt(stage, { ...activeProfile, enabled: false, experimentMode: "none" });
+          const [activeData, neutralData] = await Promise.all([
+            fetchCompletion(activePrompt, messagesSnapshot),
+            fetchCompletion(neutralPrompt, messagesSnapshot),
+          ]);
+          data = activeData;
+          renderComparison(stage, data.content, neutralData.content);
+        } else {
+          data = await fetchCompletion(activePrompt, messagesSnapshot);
+        }
+
+        state.messages.push({ role: "user", content: activePrompt });
         state.messages.push({ role: "assistant", content: data.content });
         setStatus("");
         return data.content;
@@ -497,6 +620,65 @@
       } finally {
         setBusy(false);
       }
+    }
+
+    async function fetchPrompt(stage, currentProfile) {
+      const response = await fetch("/api/prompt", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          stage,
+          topic: $("topic").value,
+          aiSide: aiSide(),
+          userSide: userSide(),
+          userOpening: state.userOpening,
+          userRebuttal: state.userRebuttal,
+          profile: currentProfile,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "プロンプト生成に失敗しました。");
+      return data.prompt;
+    }
+
+    async function fetchCompletion(prompt, messages) {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          model: $("model").value,
+          messages,
+          prompt,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "生成に失敗しました。");
+      return data;
+    }
+
+    function renderComparison(stage, personalizedText, neutralText) {
+      const panel = $("comparisonPanel");
+      panel.classList.add("enabled");
+      const div = document.createElement("div");
+      div.className = "message";
+      div.innerHTML =
+        "<strong></strong><div class=\"compare-grid\">" +
+        "<div class=\"compare-card\"><strong>パーソナライズ版</strong><span></span></div>" +
+        "<div class=\"compare-card\"><strong>非パーソナライズ版</strong><span></span></div>" +
+        "</div>";
+      div.querySelector("strong").textContent = "開発者比較: " + stageLabel(stage);
+      const spans = div.querySelectorAll(".compare-card span");
+      spans[0].textContent = personalizedText;
+      spans[1].textContent = neutralText;
+      panel.appendChild(div);
+    }
+
+    function stageLabel(stage) {
+      return {
+        opening: "冒頭意見",
+        rebuttal: "反論",
+        conclusion: "結論",
+      }[stage] || stage;
     }
 
     function profile() {
@@ -517,6 +699,14 @@
         selfRelevanceScore: selfRelevance.value,
         selfRelevanceLabel: selfRelevance.options[selfRelevance.selectedIndex].text,
         concerns: $("concerns").value,
+        reiRationalEvidence: $("reiRationalEvidence").value,
+        reiRationalComplexity: $("reiRationalComplexity").value,
+        reiRationalConsistency: $("reiRationalConsistency").value,
+        reiRationalStructure: $("reiRationalStructure").value,
+        reiExperientialIntuition: $("reiExperientialIntuition").value,
+        reiExperientialConcrete: $("reiExperientialConcrete").value,
+        reiExperientialFeeling: $("reiExperientialFeeling").value,
+        reiExperientialStories: $("reiExperientialStories").value,
         partySupport: $("partySupport").value,
         partySupportStrengthScore: partySupportStrength.value,
         partySupportStrengthLabel: partySupportStrength.options[partySupportStrength.selectedIndex].text,
@@ -532,7 +722,7 @@
 
     function initModeFromUrl() {
       const mode = new URLSearchParams(location.search).get("mode");
-      if (["none", "japan_adaptive", "party_affiliation"].includes(mode)) {
+      if (["none", "japan_adaptive", "rei_personalized", "party_affiliation"].includes(mode)) {
         $("experimentMode").value = mode;
       }
       updateModeVisibility();
@@ -541,6 +731,7 @@
     function updateModeVisibility() {
       const mode = $("experimentMode").value;
       $("japanProfile").classList.toggle("enabled", mode === "japan_adaptive");
+      $("reiProfile").classList.toggle("enabled", mode === "rei_personalized");
       $("partyProfile").classList.toggle("enabled", mode === "party_affiliation");
     }
 
@@ -548,6 +739,7 @@
       return {
         none: "非パーソナライズ",
         japan_adaptive: "日本適応型パーソナライズ",
+        rei_personalized: "REI型パーソナライズ",
         party_affiliation: "政党属性パーソナライズ",
       }[mode] || mode;
     }
@@ -587,10 +779,7 @@
         const currentProfile = profile();
         const response = await fetch("/api/store", {
           method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-app-access-token": $("accessToken").value.trim(),
-          },
+          headers: { "content-type": "application/json" },
           body: JSON.stringify({
             topic: $("topic").value,
             model: $("model").value,
@@ -618,7 +807,6 @@
       try {
         const response = await fetch("/api/store", {
           method: "GET",
-          headers: { "x-app-access-token": $("accessToken").value.trim() },
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "履歴の読込に失敗しました。");
@@ -639,9 +827,7 @@
     async function loadSession(id) {
       setStatus("セッション読込中...");
       try {
-        const response = await fetch("/api/session?id=" + encodeURIComponent(id), {
-          headers: { "x-app-access-token": $("accessToken").value.trim() },
-        });
+        const response = await fetch("/api/session?id=" + encodeURIComponent(id));
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "セッションの読込に失敗しました。");
         transcript.innerHTML = "";
@@ -667,6 +853,14 @@
       if (loadedProfile.evidenceOther) $("evidenceOther").value = loadedProfile.evidenceOther;
       if (loadedProfile.selfRelevanceScore) $("selfRelevance").value = loadedProfile.selfRelevanceScore;
       if (loadedProfile.concerns) $("concerns").value = loadedProfile.concerns;
+      if (loadedProfile.reiRationalEvidence) $("reiRationalEvidence").value = loadedProfile.reiRationalEvidence;
+      if (loadedProfile.reiRationalComplexity) $("reiRationalComplexity").value = loadedProfile.reiRationalComplexity;
+      if (loadedProfile.reiRationalConsistency) $("reiRationalConsistency").value = loadedProfile.reiRationalConsistency;
+      if (loadedProfile.reiRationalStructure) $("reiRationalStructure").value = loadedProfile.reiRationalStructure;
+      if (loadedProfile.reiExperientialIntuition) $("reiExperientialIntuition").value = loadedProfile.reiExperientialIntuition;
+      if (loadedProfile.reiExperientialConcrete) $("reiExperientialConcrete").value = loadedProfile.reiExperientialConcrete;
+      if (loadedProfile.reiExperientialFeeling) $("reiExperientialFeeling").value = loadedProfile.reiExperientialFeeling;
+      if (loadedProfile.reiExperientialStories) $("reiExperientialStories").value = loadedProfile.reiExperientialStories;
       if (loadedProfile.partySupport) $("partySupport").value = loadedProfile.partySupport;
       if (loadedProfile.partySupportStrengthScore) $("partySupportStrength").value = loadedProfile.partySupportStrengthScore;
       if (loadedProfile.politicalInterestScore) $("politicalInterest").value = loadedProfile.politicalInterestScore;
